@@ -5,7 +5,7 @@ const test = require('ava');
 
 import { cypherParams, movieOutput, movieParams, movieQuery, querySet } from './querySet';
 import { Neo4jGraphQL } from '@neo4j/graphql';
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-lambda';
 
 const neo4j = require('neo4j-driver');
 
@@ -18,7 +18,7 @@ function mockDriver() {
         ),
         { disableLosslessIntegers: true }
     );
-
+``
     driver.session = () => mockSessionFromQuerySet(querySet);
     driver.verifyConnectivity = () => Promise.resolve({});
     driver.supportsMultiDb = () => Promise.resolve(true);
@@ -32,13 +32,21 @@ const user = {
 };
 
 const typeDefs = `
+type Person {
+    name: String!
+    born: Int
+    actedInMovies: [Movie!]! @relationship(type: "ACTED_IN", direction: OUT)
+    directedMovies: [Movie!]! @relationship(type: "DIRECTED", direction: OUT)
+}
+
 type Movie {
     title: String!
     released: Int
+    actors: [Person!]! @relationship(type: "ACTED_IN", direction: IN)
 }
 
 type Query {
-    getMovies (title: String!): [Movie] @cypher(statement: "${movieQuery}")
+    getMovies (title: String!): [Movie] @cypher(statement: "match (movie:Movie {title:$title}) return movie")
 }
 `;
 
@@ -62,10 +70,10 @@ const server = new ApolloServer(
     {
         schema,
         context,
-        cors: {
-            origin: '*',
-            methods: 'GET,HEAD,POST',
-        },
+        // cors: {
+        //     origin: '*',
+        //     methods: 'GET,HEAD,POST',
+        // },
         introspection: true,
     });
 

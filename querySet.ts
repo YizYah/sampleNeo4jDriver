@@ -10,7 +10,13 @@ export const auth = {
 
 
 // specific movie query info
-export const movieQuery = 'match (movie:Movie {title:$title}) return movie'
+
+export const movieQuery = `
+WITH apoc.cypher.runFirstColumn("match (movie:Movie {title:$title}) return movie", {auth: $auth, cypherParams: $cypherParams, title: $title}, true) as x
+                UNWIND x as this
+            
+RETURN this { .title, .released } AS this`
+
 export const movieParams = {
     title: "Forrest Gump",
     auth,
