@@ -1,10 +1,22 @@
-import {QuerySpec} from "neo-forgery";
+import { QuerySpec } from 'neo-forgery';
 
+// general server param constants
+export const cypherParams = { 'currentUserId': 'f5224bcb-12d7-48d3-8943-4fa862afa1ec' };
+
+export const auth = {
+    'isAuthenticated': false,
+    'roles': [],
+};
+
+
+// specific movie query info
 export const movieQuery = 'match (movie:Movie {title:$title}) return movie'
 export const movieParams = {
-    title: "Forrest Gump"
+    title: "Forrest Gump",
+    auth,
+    cypherParams,
 }
-const expectedOutput = {
+export const movieOutput = {
     records: [
         {
             "keys": [
@@ -35,10 +47,12 @@ const expectedOutput = {
         },
     ]
 }
+
+
 export const querySet: QuerySpec[] = [
     {
         query: movieQuery,
         params: movieParams,
-        output: expectedOutput,
+        output: movieOutput,
     }
 ]

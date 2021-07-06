@@ -1,35 +1,35 @@
-require('dotenv').config()
-import {querySet, movieQuery, movieParams} from "./querySet";
+import { mockSessionFromQuerySet, mockResultsFromCapturedOutput } from 'neo-forgery';
 
-const neo4j = require('neo4j-driver')
+require('dotenv').config();
+const test = require('ava');
 
-import {Neo4jGraphQL} from '@neo4j/graphql'
-import {mockSessionFromQuerySet} from 'neo-forgery'
-import {ApolloServer} from 'apollo-server'
+import { cypherParams, movieOutput, movieParams, movieQuery, querySet } from './querySet';
+import { Neo4jGraphQL } from '@neo4j/graphql';
+import { ApolloServer } from 'apollo-server';
+
+const neo4j = require('neo4j-driver');
 
 function mockDriver() {
     const driver = neo4j.driver(
-        process.env.DB_URI,
+        process.env.URI,
         neo4j.auth.basic(
-            process.env.DB_USER,
-            process.env.DB_PASSWORD,
+            process.env.USER_NAME,
+            process.env.PASSWORD,
         ),
-    )
+        { disableLosslessIntegers: true }
+    );
 
-    driver.session = () => mockSessionFromQuerySet(querySet)
+    driver.session = () => mockSessionFromQuerySet(querySet);
     driver.verifyConnectivity = () => Promise.resolve({});
     driver.supportsMultiDb = () => Promise.resolve(true);
     driver.supportsTransactionConfig = () => Promise.resolve(true);
-    return driver
+    return driver;
 }
 
-// Create a context
-const cypherParams = {"currentUserId": "f5224bcb-12d7-48d3-8943-4fa862afa1ec"}
 const user = {
-    "id": "f5224bcb-12d7-48d3-8943-4fa862afa1ec",
-    "roles": ["moderator"]
-}
-
+    'id': 'f5224bcb-12d7-48d3-8943-4fa862afa1ec',
+    'roles': ['moderator'],
+};
 
 const typeDefs = `
 type Movie {
@@ -41,22 +41,21 @@ type Query {
     getMovies (title: String!): [Movie] @cypher(statement: "${movieQuery}")
 }
 `;
-console.log(`typesDefs=${typeDefs}`)
 
 const schema = new Neo4jGraphQL({
     typeDefs,
-}).schema
+}).schema;
 
-const driver = mockDriver()
+const driver = mockDriver();
 
-function context({event, context} : { event: any, context: any }): any {
+function context({ event, context }: { event: any, context: any }): any {
     return ({
         event,
         context,
         driver,
         user,
         cypherParams,
-    })
+    });
 }
 
 const server = new ApolloServer(
@@ -79,10 +78,20 @@ query GetMovies($title: String!){
 }
 `;
 
-(async () => {
+test('SSS [spoof simple server]', async (t: any) => {
     const result = await server.executeOperation({
         query: MOVIES,
         variables: movieParams,
     });
-    console.log(`result=${JSON.stringify(result)}`)
-})()
+    console.log(`result=${JSON.stringify(result)}`);
+    // console.log(`movieOutput.records=${JSON.stringify(movieOutput.records)}`);
+    // console.log(`mockResultsFromCapturedOutput(movieOutput).records=${JSON.stringify(mockResultsFromCapturedOutput(movieOutput).records)}`);
+    t.true(!result.errors);
+
+    t.deepEqual(
+        // @ts-ignore
+        result.data.getMovies,
+        mockResultsFromCapturedOutput(movieOutput)
+            .records.map((record:any)=> record.get('movie').properties)
+    );
+});
