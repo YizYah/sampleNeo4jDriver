@@ -1,4 +1,6 @@
-import { QuerySpec } from 'neo-forgery';
+import {mockResultsFromData, QuerySpec} from 'neo-forgery';
+
+import { appSpecQuery, APP_SPEC_VARS, expectedResultForAppSpec } from './appSpecQueryInfo'
 
 // general server param constants
 export const cypherParams = { 'currentUserId': 'f5224bcb-12d7-48d3-8943-4fa862afa1ec' };
@@ -40,10 +42,7 @@ export const movieOutput = {
                     ],
                     "properties": {
                         "title": "Forrest Gump",
-                        "released": {
-                            "low": 1994,
-                            "high": 0
-                        }
+                        "released": 1994
                     }
                 }
             ],
@@ -54,11 +53,20 @@ export const movieOutput = {
     ]
 }
 
+console.log(`mockResultsFromData(expectedResultForAppSpec) = 
+${JSON.stringify(mockResultsFromData(expectedResultForAppSpec),null,2)}`)
 
 export const querySet: QuerySpec[] = [
     {
         query: movieQuery,
         params: movieParams,
         output: movieOutput,
-    }
+    },
+    {
+        name: 'appSpec',
+        query: appSpecQuery,
+        output: mockResultsFromData(expectedResultForAppSpec),
+        params: APP_SPEC_VARS,
+    },
+
 ]

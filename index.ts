@@ -3,7 +3,8 @@ import { mockSessionFromQuerySet, mockResultsFromCapturedOutput } from 'neo-forg
 require('dotenv').config();
 const test = require('ava');
 
-import { cypherParams, movieOutput, movieParams, movieQuery, querySet } from './querySet';
+import { cypherParams, movieOutput, movieParams, querySet } from './querySet';
+import {APP_SPEC, APP_SPEC_VARS, expectedResultForAppSpec} from './appSpecQueryInfo'
 import { Neo4jGraphQL } from '@neo4j/graphql';
 import { ApolloServer } from 'apollo-server-lambda';
 
@@ -32,11 +33,18 @@ const user = {
 };
 
 const typeDefs = `
+type App @exclude {
+    id: ID!
+    value: String
+    #appSpecUserTypes: [UserType] @relationship(type: "Assn_app_to_userType_for_e36aa4c6-8029-4969-b1fe-d659bdb9eb42", direction: OUT) 
+    #appSpecDescriptions: [Description] @relationship(type: "Assn_app_to_description_for_e36aa4c6-8029-4969-b1fe-d659bdb9eb42", direction: OUT)
+}
+
 type Person {
     name: String!
     born: Int
-    actedInMovies: [Movie!]! @relationship(type: "ACTED_IN", direction: OUT)
-    directedMovies: [Movie!]! @relationship(type: "DIRECTED", direction: OUT)
+    #actedInMovies: [Movie!]! @relationship(type: "ACTED_IN", direction: OUT)
+    #directedMovies: [Movie!]! @relationship(type: "DIRECTED", direction: OUT)
 }
 
 type Movie {
@@ -47,6 +55,7 @@ type Movie {
 
 type Query {
     getMovies (title: String!): [Movie] @cypher(statement: "match (movie:Movie {title:$title}) return movie")
+    appSpec (customerId: ID!): [App] @cypher(statement: "match (customer:Customer {id:$customerId})-[:\`Assn_customer_to_app_for_e36aa4c6-8029-4969-b1fe-d659bdb9eb42\`]-(app:App) return app")
 }
 `;
 
@@ -86,14 +95,12 @@ query GetMovies($title: String!){
 }
 `;
 
-test('SSS [spoof simple server]', async (t: any) => {
+test.skip('SSS [spoof simple server]', async (t: any) => {
     const result = await server.executeOperation({
         query: MOVIES,
         variables: movieParams,
     });
-    console.log(`result=${JSON.stringify(result)}`);
-    // console.log(`movieOutput.records=${JSON.stringify(movieOutput.records)}`);
-    // console.log(`mockResultsFromCapturedOutput(movieOutput).records=${JSON.stringify(mockResultsFromCapturedOutput(movieOutput).records)}`);
+    // console.log(`result=${JSON.stringify(result)}`);
     t.true(!result.errors);
 
     t.deepEqual(
@@ -101,5 +108,22 @@ test('SSS [spoof simple server]', async (t: any) => {
         result.data.getMovies,
         mockResultsFromCapturedOutput(movieOutput)
             .records.map((record:any)=> record.get('movie').properties)
+    );
+});
+
+
+test('AppSpec Query', async (t: any) => {
+    const result = await server.executeOperation({
+        query: APP_SPEC,
+        variables: APP_SPEC_VARS,
+    });
+    console.log(`result=${JSON.stringify(result)}`);
+    t.true(!result.errors);
+
+    t.deepEqual(
+        // @ts-ignore
+        result.data.appSpec,
+        mockResultsFromCapturedOutput(expectedResultForAppSpec)
+            .records.map((record:any)=> record.get('app').properties)
     );
 });

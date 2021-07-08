@@ -19,7 +19,7 @@
     "apollo-server": "^2.25.2",
     "apollo-server-lambda": "^2.25.2",
     "dotenv": "^10.0.0",
-    "neo-forgery": "^1.7.0-0",
+    "neo-forgery": "^1.7.0",
     "neo4j-driver": "^4.3.1"
   },
   "ava": {
