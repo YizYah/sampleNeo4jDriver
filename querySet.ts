@@ -53,8 +53,8 @@ export const movieOutput = {
     ]
 }
 
-console.log(`mockResultsFromData(expectedResultForAppSpec) = 
-${JSON.stringify(mockResultsFromData(expectedResultForAppSpec),null,2)}`)
+console.log(`expectedResultForAppSpec = 
+${JSON.stringify(expectedResultForAppSpec,null,2)}`)
 
 export const querySet: QuerySpec[] = [
     {
@@ -65,7 +65,7 @@ export const querySet: QuerySpec[] = [
     {
         name: 'appSpec',
         query: appSpecQuery,
-        output: mockResultsFromData(expectedResultForAppSpec),
+        output: expectedResultForAppSpec,
         params: APP_SPEC_VARS,
     },
 

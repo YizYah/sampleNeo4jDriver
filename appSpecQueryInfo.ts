@@ -26,7 +26,7 @@ export const APP_SPEC_VARS = {
   },
 }
 
-export const expectedResultForAppSpec = [
+export const dataResultForAppSpec = [
   {
     id: '283bc67c-b1b9-4a57-9377-6823f39b8b5b',
     value: 'Sample for Yisroel',
@@ -41,3 +41,109 @@ export const expectedResultForAppSpec = [
     value: 'Sample for Yisroel',
   },
 ]
+
+
+export const expectedResultForAppSpec = {
+  records: [
+    {
+      "keys": [
+        "app"
+      ],
+      "length": 1,
+      "_fields": [
+        {
+          "identity": {
+            "low": 4499,
+            "high": 0
+          },
+          "labels": [
+            "App",
+            "Exported"
+          ],
+          "properties": {
+            "value": "Sample for Yisroel",
+            "id": "283bc67c-b1b9-4a57-9377-6823f39b8b5b"
+          }
+        }
+      ],
+      "_fieldLookup": {
+        "app": 0
+      }
+    },
+    {
+      "keys": [
+        "app"
+      ],
+      "length": 1,
+      "_fields": [
+        {
+          "identity": {
+            "low": 4497,
+            "high": 0
+          },
+          "labels": [
+            "App",
+            "Exported"
+          ],
+          "properties": {
+            "value": "Sample for Yisroel",
+            "id": "eca6861f-6f9f-4ba1-bee6-3a7904956325"
+          }
+        }
+      ],
+      "_fieldLookup": {
+        "app": 0
+      }
+    },
+    {
+      "keys": [
+        "app"
+      ],
+      "length": 1,
+      "_fields": [
+        {
+          "identity": {
+            "low": 4496,
+            "high": 0
+          },
+          "labels": [
+            "App",
+            "Exported"
+          ],
+          "properties": {
+            "id": "7603d148-cf5d-4d8c-a6b2-f4dad4c3f69e",
+            "value": "Sample for Yisroel"
+          }
+        }
+      ],
+      "_fieldLookup": {
+        "app": 0
+      }
+    },
+    {
+      "keys": [
+        "app"
+      ],
+      "length": 1,
+      "_fields": [
+        {
+          "identity": {
+            "low": 4498,
+            "high": 0
+          },
+          "labels": [
+            "App",
+            "Exported"
+          ],
+          "properties": {
+            "value": "Sample for Yisroel",
+            "id": "b8aa9e8b-070b-494d-8953-7da50d4da8f8"
+          }
+        }
+      ],
+      "_fieldLookup": {
+        "app": 0
+      }
+    }
+  ]
+}

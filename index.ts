@@ -33,8 +33,8 @@ const user = {
 };
 
 const typeDefs = `
-type App @exclude {
-    id: ID!
+type App {
+    id: ID
     value: String
     #appSpecUserTypes: [UserType] @relationship(type: "Assn_app_to_userType_for_e36aa4c6-8029-4969-b1fe-d659bdb9eb42", direction: OUT) 
     #appSpecDescriptions: [Description] @relationship(type: "Assn_app_to_description_for_e36aa4c6-8029-4969-b1fe-d659bdb9eb42", direction: OUT)
@@ -117,7 +117,6 @@ test('AppSpec Query', async (t: any) => {
         query: APP_SPEC,
         variables: APP_SPEC_VARS,
     });
-    console.log(`result=${JSON.stringify(result)}`);
     t.true(!result.errors);
 
     t.deepEqual(
